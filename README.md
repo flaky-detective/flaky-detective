@@ -9,6 +9,12 @@ If flaky, generates a GitHub Actions workflow to quarantine the test (run nightl
 npx flaky-detective "tests/login.spec.ts" 10
 ```
 
+- Run npx flaky-detective
+
+- First argument = test file pattern (e.g., "tests/login.spec.ts")
+
+- Second argument = number of runs (default 10 if omitted)
+
 ## Example
 
 Running tests/login.spec.ts 10 times...

@@ -6,9 +6,16 @@ import path from 'path';
 const testPattern = process.argv[2];
 const runs = parseInt(process.argv[3]) || 10;
 
+// Parse --output argument
+let outputFile = 'flaky-report.json';
+const outputIndex = process.argv.indexOf('--output');
+if (outputIndex !== -1 && process.argv[outputIndex + 1]) {
+  outputFile = process.argv[outputIndex + 1];
+}
+
 if (!testPattern) {
-  console.log('Usage: node index.js <test-pattern> [runs]');
-  console.log('Example: node index.js "tests/login.spec.ts" 10');
+  console.log('Usage: node index.js <test-pattern> [runs] [--output <file>]');
+  console.log('Example: node index.js "tests/login.spec.ts" 10 --output results.json');
   process.exit(1);
 }
 
@@ -86,6 +93,9 @@ jobs:
 `;
 }
 
+let topClass = 'UNKNOWN';
+let suggestion = FIXES.UNKNOWN;
+
 if (isFlaky) {
   const failures = results.filter(r => r.status === 'failed');
   const classifications = {};
@@ -93,14 +103,34 @@ if (isFlaky) {
     const cls = classifyError(f.error);
     classifications[cls] = (classifications[cls] || 0) + 1;
   });
-  const topClass = Object.entries(classifications).sort((a,b) => b[1] - a[1])[0][0];
+  topClass = Object.entries(classifications).sort((a,b) => b[1] - a[1])[0][0];
+  suggestion = FIXES[topClass] || FIXES.UNKNOWN;
   console.log(`\nMost common failure: ${topClass}`);
-  console.log(`Fix: ${FIXES[topClass] || FIXES.UNKNOWN}`);
+  console.log(`Fix: ${suggestion}`);
   console.log('\n--- Quarantine Config ---');
   console.log(generateQuarantineConfig(testPattern, topClass));
   console.log('--- Copy the above to .github/workflows/ ---\n');
 }
 
-const report = { testPattern, runs, passed, failed, isFlaky, results };
-fs.writeFileSync('flaky-report.json', JSON.stringify(report, null, 2));
-console.log('Report saved to flaky-report.json');
+// Build tests array for Pro Action compatibility
+const tests = [{
+  file: testPattern,
+  passed: passed,
+  total: runs,
+  passRate: passed / runs,
+  topClassification: topClass,
+  suggestion: suggestion,
+  isFlaky: isFlaky
+}];
+
+const finalReport = {
+  tests: tests,
+  summary: {
+    totalTests: 1,
+    flakyTests: isFlaky ? 1 : 0,
+    passRateOverall: passed / runs
+  }
+};
+
+fs.writeFileSync(outputFile, JSON.stringify(finalReport, null, 2));
+console.log(`Report saved to ${outputFile}`);

@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/flaky-detective/flaky-detective#readme",
   "bin": {
-    "flaky-detective": "./index.js"
+    "flaky-detective": "index.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",

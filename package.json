@@ -1,0 +1,28 @@
+{
+  "name": "flaky-detective",
+  "version": "1.0.0",
+  "description": "Detect flaky Playwright tests, classify root causes, generate quarantine CI configs.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flaky-detective/flaky-detective.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/flaky-detective/flaky-detective/issues"
+  },
+  "homepage": "https://github.com/flaky-detective/flaky-detective#readme",
+  "bin": {
+    "flaky-detective": "./index.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^25.9.1"
+  }
+}
